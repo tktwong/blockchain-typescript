@@ -1,5 +1,5 @@
 import {Block} from './Block'
-import * as CryptoJS from "crypto-js";
+import * as CryptoJS from "crypto-js"
 
 class Blockchain {
   private static genesisBlock: Block = new Block(
@@ -13,6 +13,25 @@ class Blockchain {
     const nextTimestamp: number = new Date().getTime() / 1000
     let hash = this.calculateHash(nextIndex, previousBlock.previousHash, nextTimestamp, blockData)
     return new Block(nextIndex, hash, previousBlock.hash, nextTimestamp, blockData)
+  }
+
+  public isValidChain(blockchainToValidate: Block[]): boolean {
+    let block: Block = blockchainToValidate[0];
+    if (!this.isValidGenesis(block)) {
+      return false
+    }
+
+    for (let i = 1; i < blockchainToValidate.length; i++) {
+      if (!this.isValidNewBlock(blockchainToValidate[i], blockchainToValidate[i - 1])) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  public isValidGenesis(block: Block): boolean {
+    return JSON.stringify(block) === JSON.stringify(Blockchain.genesisBlock)
   }
 
   public isValidNewBlock(newBlock: Block, previousBlock: Block): boolean {
