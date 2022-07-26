@@ -8,23 +8,24 @@ import _ from "lodash";
 class P2PServer {
   private sockets: WebSocket[] = []
   private blockchain: Blockchain
+  private port: number
 
   constructor(port: number, blockchain: Blockchain) {
+    this.port = port
     this.blockchain = blockchain
-    this.init(port)
   }
 
   public getSockets(): WebSocket[] {
     return this.sockets;
   }
 
-  private init(port: number) {
-    const server: Server = new WebSocket.Server<WebSocket.WebSocket>({port: port})
+  public initP2PServer() {
+    const server: Server = new WebSocket.Server<WebSocket.WebSocket>({port: this.port})
     server.on('connection', (ws: WebSocket) => {
       this.initConnection(ws)
     })
 
-    console.log(`listening websocket p2p port on: ${port}`)
+    console.log(`listening websocket p2p port on: ${this.port}`)
   }
 
   public connectToPeers(newPeer: any) {
