@@ -1,24 +1,18 @@
 import {Blockchain} from './Blockchain'
 import * as  bodyParser from 'body-parser'
 import express from 'express'
-import * as _ from 'lodash'
-import {Block} from "./Block";
+import {Block} from "./Block"
+import {MessageType} from '../constants'
+import {Message} from "./Message"
+import {P2PServer} from "./P2PServer"
 
 class Node {
   private blockChain: Blockchain
+  private p2pServer: P2PServer
 
-  constructor(blockChain: Blockchain) {
-    this.blockChain = blockChain
-  }
-
-  public replaceChain(newBlockchain: Blockchain) {
-    if (newBlockchain.isValidChain() && newBlockchain.isDeeperThan(this.blockChain)) {
-      console.log('Received blockchain is valid. Replacing current blockchain with received blockchain')
-      this.blockChain = newBlockchain
-      this.broadcastLatest()
-    } else {
-      console.log('Received blockchain invalid')
-    }
+  constructor(p2pPort: number) {
+    this.blockChain = new Blockchain()
+    this.p2pServer = new P2PServer(p2pPort, this.blockChain)
   }
 
   public initHttpServer(myHttpPort: number) {
@@ -34,6 +28,18 @@ class Node {
       res.send(newBlock)
     })
 
+    app.get('/peers', (req, res) => {
+      res.send(this.p2pServer.getSockets().map((s: any) => s._socket.remoteAddress + ':' + s._socket.remotePort))
+    })
+
+    app.post('/addPeer', (req, res) => {
+      this.p2pServer.connectToPeers(req.body.peer);
+      res.send();
+    });
+
+    app.listen(myHttpPort, () => {
+      console.log('Listening http on port: ' + myHttpPort)
+    })
   }
 
   public generateNextBlock(blockData: string): Block {
@@ -42,10 +48,6 @@ class Node {
     const nextTimestamp: number = new Date().getTime() / 1000
     let hash = this.blockChain.calculateHash(nextIndex, previousBlock.previousHash, nextTimestamp, blockData)
     return new Block(nextIndex, hash, previousBlock.hash, nextTimestamp, blockData)
-  }
-
-  private broadcastLatest() {
-
   }
 
 

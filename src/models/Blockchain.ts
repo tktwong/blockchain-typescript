@@ -5,15 +5,13 @@ class Blockchain {
   private static genesisBlock: Block = new Block(
     0, '816534932c2b7154836da6afc367695e6337db8a921823784c14378abed4f7d7', '', 1465154705, 'my genesis block!!'
   )
-  public readonly blockchainBlocks: Block[] = [Blockchain.genesisBlock]
+  public blockchainBlocks: Block[] = [Blockchain.genesisBlock]
 
-  constructor(blockchainBlocks: Block[]) {
-    this.blockchainBlocks = blockchainBlocks;
+  constructor() {
   }
 
 
-  public isValidChain(): boolean {
-    const blockchainToValidate: Block[] = this.blockchainBlocks
+  public isValidChain(blockchainToValidate: Block[]): boolean {
     let block: Block = blockchainToValidate[0];
     if (!this.isValidGenesis(block)) {
       return false
@@ -72,6 +70,25 @@ class Blockchain {
 
   private calculateBlockHash(newBlock: Block) {
     return this.calculateHash(newBlock.index, newBlock.previousHash, newBlock.timestamp, newBlock.data)
+  }
+
+  public addBlock(newBlock: Block) {
+    if (this.isValidNewBlock(newBlock, this.getLatestBlock())) {
+      this.blockchainBlocks.push(newBlock)
+      return true
+    }
+    return false;
+  }
+
+  public replace(newBlocks: Block[]): boolean {
+    if (this.isValidChain(newBlocks) && newBlocks.length > this.blockchainBlocks.length) {
+      console.log('Received blockchain is valid. Replacing current blockchain with received blockchain')
+      this.blockchainBlocks = newBlocks
+      return true
+    } else {
+      console.log('Received blockchain invalid')
+      return false
+    }
   }
 }
 

@@ -16,7 +16,9 @@ class Block {
     this.data = data;
   }
 
-
+  public isDeeperThan(block: Block) {
+    return this.index > block.index
+  }
 }
 
 export {
