@@ -17,8 +17,8 @@ export class HttpServer {
 
   public initHttpServer() {
     const app = express()
-    app.use(bodyParser.json())
 
+    app.use(bodyParser.json())
     app.get('/blocks', (req, res) => {
       res.send(this.blockChain.blockchainBlocks)
     })
@@ -47,8 +47,10 @@ export class HttpServer {
     const previousBlock: Block = this.blockChain.getLatestBlock();
     const nextIndex: number = previousBlock.index + 1
     const nextTimestamp: number = new Date().getTime() / 1000
-    let hash = this.blockChain.calculateHash(nextIndex, previousBlock.previousHash, nextTimestamp, blockData)
-    return new Block(nextIndex, hash, previousBlock.hash, nextTimestamp, blockData)
+    let hash = this.blockChain.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData)
+    const nextBlock = new Block(nextIndex, hash, previousBlock.hash, nextTimestamp, blockData)
+    this.blockChain.addBlock(nextBlock)
+    return nextBlock
   }
 
 }
