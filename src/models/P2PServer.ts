@@ -155,8 +155,12 @@ class P2PServer {
     }
   }
 
-  private broadcastLatest() {
+  public broadcastLatest() {
     this.broadcast(this.responseLatestMsg())
+  }
+
+  public broadcastBlockchain() {
+    this.broadcast(new Message(MessageType.RESPONSE_BLOCKCHAIN, JSON.stringify(this.blockchain.blockchainBlocks)))
   }
 
 }

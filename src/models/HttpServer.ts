@@ -50,6 +50,7 @@ export class HttpServer {
     let hash = this.blockChain.calculateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData)
     const nextBlock = new Block(nextIndex, hash, previousBlock.hash, nextTimestamp, blockData)
     this.blockChain.addBlock(nextBlock)
+    this.p2pServer.broadcastBlockchain()
     return nextBlock
   }
 
