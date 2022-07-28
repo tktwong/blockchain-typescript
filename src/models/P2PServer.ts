@@ -117,7 +117,7 @@ class P2PServer {
   }
 
   private responseLatestMsg(): Message {
-    return new Message(MessageType.RESPONSE_BLOCKCHAIN, JSON.stringify(this.blockchain.getLatestBlock()));
+    return new Message(MessageType.RESPONSE_BLOCKCHAIN, JSON.stringify([this.blockchain.getLatestBlock()]));
   }
 
   private handleBlockchainResponse(receivedBlocks: Block[]) {
@@ -135,7 +135,7 @@ class P2PServer {
 
     const latestBlock = this.blockchain.getLatestBlock()
 
-    if (latestBlockReceived.isDeeperThan(latestBlock)) {
+    if (latestBlockReceived.index > latestBlock.index) {
       console.log('blockchain possibly behind. We got: ' + latestBlock.index + ' Peer got: ' + latestBlockReceived.index)
       if (latestBlock.hash === latestBlockReceived.previousHash) {
         if (this.blockchain.addBlock(latestBlockReceived)) {
@@ -158,11 +158,6 @@ class P2PServer {
   public broadcastLatest() {
     this.broadcast(this.responseLatestMsg())
   }
-
-  public broadcastBlockchain() {
-    this.broadcast(new Message(MessageType.RESPONSE_BLOCKCHAIN, JSON.stringify(this.blockchain.blockchainBlocks)))
-  }
-
 }
 
 export {

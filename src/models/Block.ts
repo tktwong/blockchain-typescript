@@ -1,6 +1,3 @@
-import * as CryptoJS from 'crypto-js'
-
-
 class Block {
   readonly index: number
   readonly hash: string
@@ -14,10 +11,6 @@ class Block {
     this.previousHash = previousHash;
     this.timestamp = timestamp;
     this.data = data;
-  }
-
-  public isDeeperThan(block: Block) {
-    return this.index > block.index
   }
 }
 
